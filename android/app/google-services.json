@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "233821184424",
+    "project_id": "abhiman-assignment",
+    "storage_bucket": "abhiman-assignment.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:233821184424:android:482bd4cedec8b7c0d77d9d",
+        "android_client_info": {
+          "package_name": "com.example.abhiman_assignment"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDKMUME4se9bxPYN9VD3OfTKvnfBjvp2c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
