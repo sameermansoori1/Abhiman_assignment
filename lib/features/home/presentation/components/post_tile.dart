@@ -1,9 +1,11 @@
 import 'package:abhiman_assignment/features/auth/domain/entities/app_user.dart';
 import 'package:abhiman_assignment/features/auth/presentation/components/my_textfield.dart';
 import 'package:abhiman_assignment/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:abhiman_assignment/features/home/presentation/components/comment_tile.dart';
 import 'package:abhiman_assignment/features/post/domain/entities/comment.dart';
 import 'package:abhiman_assignment/features/post/domain/entities/post.dart';
 import 'package:abhiman_assignment/features/post/presentation/cubits/post_cubit.dart';
+import 'package:abhiman_assignment/features/post/presentation/cubits/post_states.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -97,8 +99,8 @@ class _PostTileState extends State<PostTile> {
     final newComment = Comment(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         postId: widget.post.id,
-        userId: widget.post.userId,
-        userName: widget.post.userName,
+        userId: currentUser!.uid,
+        userName: currentUser!.name,
         text: commentTextController.text,
         timestamp: DateTime.now());
 
@@ -113,6 +115,7 @@ class _PostTileState extends State<PostTile> {
     super.dispose();
   }
 
+//show option for deletion
   void showOptions() {
     showDialog(
       context: context,
@@ -209,13 +212,73 @@ class _PostTileState extends State<PostTile> {
                     width: 15,
                   ),
                   GestureDetector(
-                    child: Icon(Icons.comment),
                     onTap: openNewCommentBox,
+                    child: const Icon(Icons.comment),
                   ),
                   Text(widget.post.comments.length.toString()),
-                  Spacer(),
+                  const Spacer(),
                   Text(widget.post.timestamp.toString())
                 ],
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      widget.post.userName.toString(),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    // const SizedBox(
+                    //   width: 10,
+                    // ),
+                    // Text(widget.post.text.toString())
+                  ],
+                ),
+              ),
+
+              //comment section
+              BlocBuilder<PostCubit, PostState>(
+                builder: (context, state) {
+                  //Loaded
+                  if (state is PostsLoaded) {
+                    // final individual post
+                    final post = state.post
+                        .firstWhere((post) => post.id == widget.post.id);
+
+                    //control who many comments we have to show
+                    if (post.comments.isNotEmpty) {
+                      int showCommentCount = post.comments.length;
+
+                      return ListView.builder(
+                        itemCount: showCommentCount,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          //get individual comment
+                          final comment = post.comments[index];
+
+                          //comment tile ui
+                          return CommentTile(comment: comment);
+                        },
+                      );
+                    }
+                  }
+
+                  //Loading
+                  if (state is PostsLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (state is PostsEror) {
+                    return Center(
+                      child: Text(state.message),
+                    );
+                  } else {
+                    return const SizedBox();
+                  }
+                },
               )
             ],
           ),
